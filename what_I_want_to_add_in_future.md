@@ -1,0 +1,1 @@
+1. If the room is full and a pirate disconnects, a nice button with an invitation to join appears to spectators.
