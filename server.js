@@ -29,6 +29,10 @@ app.get('/smart_canvas.js', function (req, res){
   res.sendFile(__dirname + '/smart_canvas.js');
 });
 
+app.get('/hooksgame.js', function (req, res){
+  res.sendFile(__dirname + '/hooksgame.js');
+});
+
 io.on('connection', function (socket) {
   var pirate;
   if (game.is_room_full()){
@@ -49,15 +53,15 @@ http.listen(3000, function () {
   console.log('Server is listening on localhost:3000');
   game = new hooks();
   console.log('Created a new game.\n' + game);
-  var game_loop = setInterval(send_package, 500);//delete
+  var game_loop = setInterval(send_package, 1000);//delete
 });
 
 function send_package(){
   console.log("Sending data.")
-  var data = {};
-  game.players.forEach(function (pirate) {
-    data[pirate.name] = pirate.get_coordinates();
+  var data = [];
+  game.pirates.forEach(function (pirate) {
+    data.push(pirate);
   });
   io.emit("data_package", data);
-  console.log(data);
+  console.log(data.join('\n'));
 }
