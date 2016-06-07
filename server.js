@@ -5,6 +5,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var hooks = require('./hooksgame');
+var socket_to_pirate = {};
 app.get('/', function (req, res) {
 	res.sendFile(__dirname + "/index.html");
 });
@@ -39,15 +40,26 @@ io.on('connection', function (socket) {
     socket.emit("alert", "The room is full");
   }else{
     pirate = game.add_new_pirate();
+    socket_to_pirate[socket] = pirate;
     console.log(game.toString());
+    socket.emit("player", pirate.name);
   }
   socket.on('disconnect', function(){
     console.log("A pirate or a spectator has disconnected");
     if (pirate){
       game.remove_pirate(pirate);
+      delete socket_to_pirate[socket];
     }
-  })
+  });
+  socket.on('user_input', function(data){
+    switch(data.type){
+      case 'click':
+        game.teleport_pirate(socket_to_pirate[socket],data.data[0],data.data[1]);
+        break;
+    }
+  });
 });
+
 var game;
 http.listen(3000, function () {
   console.log('Server is listening on localhost:3000');

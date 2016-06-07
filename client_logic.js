@@ -10,6 +10,10 @@ var socket = io();
 var background_canvas = init_background();
 var smart_canvas = init_battlefield();
 var game;
+var pirate_name;//omg danger danger danger
+socket.on("player", function(data){
+  pirate_name = data;
+});
 socket.on('data_package', function (data) {
   if (!game){
     game = new HooksGame(data, {"rendering":render.bind(this, smart_canvas)});
@@ -18,6 +22,14 @@ socket.on('data_package', function (data) {
   }
   requestAnimationFrame(render.bind(this, smart_canvas));
 });
+smart_canvas.canvas.addEventListener("click", function(event){
+  var x = event.pageX - smart_canvas.canvas.offsetLeft;
+  var y = event.pageY - smart_canvas.canvas.offsetTop;
+  if (pirate_name && game){
+    game.teleport_pirate(game.find_pirate_by_name(pirate_name),x,y);
+    socket.emit("user_input",{"type":"click","data":[x,y]});
+  }
+})
 function init_background(){
   var background_canvas = new SmartCanvas('battlefield-bg');
   background_canvas.fill_rect(0,0,background_canvas.canvas.width,background_canvas.canvas.height,"#954");

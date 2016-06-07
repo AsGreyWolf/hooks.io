@@ -27,6 +27,17 @@ HooksGame.prototype.add_new_pirate = function(){
   }
 }
 
+HooksGame.prototype.find_pirate_by_name = function(name){
+  var result = null;
+  for (var i = 0; i < this.pirates.length; i++){
+    if (this.pirates[i].name === name){
+      result = this.pirates[i];
+      break;
+    }
+  }
+  return result;
+}
+
 HooksGame.prototype.remove_pirate = function(pirate){
   this._available_names.unshift(pirate.name);
   this.pirates.splice(this.pirates.indexOf(pirate),1);
@@ -45,6 +56,11 @@ HooksGame.prototype.enact_gravity = function(rendering){
     pirate.y += 1;
   });
   rendering();
+}
+
+HooksGame.prototype.teleport_pirate = function(pirate, x, y){
+  pirate.x = x;
+  pirate.y = y;
 }
 
 //Pirate class
