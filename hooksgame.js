@@ -1,7 +1,7 @@
 "use strict";
-function HooksGame(pirates, options){
-  this.pirates = pirates || [];
+function HooksGame(options){
   this.options = options || {};
+  this.pirates = this.options.pirates || [];
   var rendering = this.options.rendering || function(){};
   this._available_names = ["John", "Arthur", "Lorenzo", "Charles"];
   this._starting_positions = {

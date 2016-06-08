@@ -52,6 +52,9 @@ io.on('connection', function (socket) {
     }
   });
   socket.on('user_input', function(data){
+    console.log("Received data from " + socket_to_pirate[socket].name + ". He sent it at " + data.time);
+    var now = new Date().getTime();
+    console.log("We received it at " + now + ". Difference " + (now - data.time));
     switch(data.type){
       case 'click':
         game.teleport_pirate(socket_to_pirate[socket],data.data[0],data.data[1]);
@@ -70,10 +73,12 @@ http.listen(3000, function () {
 
 function send_package(){
   console.log("Sending data.")
-  var data = [];
+  var data = {};
+  var pirates = [];
+  data["pirates"] = pirates;
   game.pirates.forEach(function (pirate) {
-    data.push(pirate);
+    pirates.push(pirate);
   });
   io.emit("data_package", data);
-  console.log(data.join('\n'));
+  console.log(pirates.join('\n'));
 }

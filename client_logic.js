@@ -16,9 +16,10 @@ socket.on("player", function(data){
 });
 socket.on('data_package', function (data) {
   if (!game){
-    game = new HooksGame(data, {"rendering":render.bind(this, smart_canvas)});
+    data["rendering"] = render.bind(this, smart_canvas);
+    game = new HooksGame(data);
   }else{
-    game.pirates = data;
+    game.pirates = data.pirates;
   }
   requestAnimationFrame(render.bind(this, smart_canvas));
 });
@@ -27,7 +28,8 @@ smart_canvas.canvas.addEventListener("click", function(event){
   var y = event.pageY - smart_canvas.canvas.offsetTop;
   if (pirate_name && game){
     game.teleport_pirate(game.find_pirate_by_name(pirate_name),x,y);
-    socket.emit("user_input",{"type":"click","data":[x,y]});
+    var now = new Date();
+    socket.emit("user_input",{"type":"click","data":[x,y],"time":now.getTime()});
   }
 })
 function init_background(){
