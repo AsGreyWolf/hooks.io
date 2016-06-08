@@ -52,6 +52,7 @@ io.on('connection', function (socket) {
     }
   });
   socket.on('user_input', function(data){
+    if (!socket_to_pirate[socket]) return;
     console.log("Received data from " + socket_to_pirate[socket].name + ". He sent it at " + data.time);
     var now = new Date().getTime();
     console.log("We received it at " + now + ". Difference " + (now - data.time));
