@@ -4,14 +4,14 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var hooks = require('./hooksgame');
+var hooks = require('./game-scripts/hooksgame');
 var actions_versions = {};
 app.get('/', function (req, res) {
   res.sendFile(__dirname + "/index.html");
 });
 
-app.get('/client_logic.js', function (req, res) {
-  res.sendFile(__dirname + "/client_logic.js");
+app.get('/scripts.js', function (req, res) {
+  res.sendFile(__dirname + "/client-scripts/scripts.js");
 });
 
 app.get('/style.css', function (req, res) {
@@ -24,14 +24,6 @@ app.get('/socket-io.js', function (req, res) {
 
 app.get('/captain.png', function (req, res){
   res.sendFile(__dirname + '/captain.png');
-});
-
-app.get('/smart_canvas.js', function (req, res){
-  res.sendFile(__dirname + '/smart_canvas.js');
-});
-
-app.get('/hooksgame.js', function (req, res){
-  res.sendFile(__dirname + '/hooksgame.js');
 });
 
 io.on('connection', function (socket) {
@@ -79,7 +71,6 @@ http.listen(3000, function () {
 });
 
 function send_package(){
-  console.log("Sending data.")
   var data = {};
   var pirates = [];
   data["pirates"] = pirates;
@@ -88,8 +79,4 @@ function send_package(){
     pirates.push(pirate);
   });
   io.emit("data_package", data);
-  console.log(pirates.join('\n'));
-  Object.keys(actions_versions).forEach(function(obj){
-    console.log(obj+" " + (actions_versions[obj]));
-  });
 }

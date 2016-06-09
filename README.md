@@ -12,5 +12,7 @@
 <h3>What I'd like to add or redo</h3>
 <ul>
 <li>Refactor. The code is complicated even at this stage of development </li>
+<li>Make tests</li>
+<li>Do smth with gulp</li>
 </ul>
 </p>
