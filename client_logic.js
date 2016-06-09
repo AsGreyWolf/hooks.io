@@ -29,7 +29,8 @@ smart_canvas.canvas.addEventListener("click", function(event){
   if (pirate_name && game){
     game.teleport_pirate(game.find_pirate_by_name(pirate_name),x,y);
     var now = new Date();
-    socket.emit("user_input",{"type":"click","data":[x,y],"time":now.getTime()});
+    console.log(pirate_name);
+    socket.emit("user_input",{"type":"click","data":[x,y],"time":now.getTime(),"name":pirate_name});
   }
 })
 function init_background(){

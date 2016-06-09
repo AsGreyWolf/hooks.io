@@ -41,12 +41,10 @@ SmartCanvas.prototype.draw_image = function(name, options){
   }
 }
 SmartCanvas.prototype.draw_pirates = function(data){
-  console.log("drawing pirates");
   var img = this.images["pirate"];
   var self = this;
   var width = img.width;
   var height = img.height;
-  console.log("image loaded");
   data.forEach(function(pirate){
     var name = pirate.name;
     var x = pirate.x;

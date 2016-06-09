@@ -5,7 +5,6 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var hooks = require('./hooksgame');
-var socket_to_pirate = {};
 app.get('/', function (req, res) {
 	res.sendFile(__dirname + "/index.html");
 });
@@ -40,7 +39,6 @@ io.on('connection', function (socket) {
     socket.emit("alert", "The room is full");
   }else{
     pirate = game.add_new_pirate();
-    socket_to_pirate[socket] = pirate;
     console.log(game.toString());
     socket.emit("player", pirate.name);
   }
@@ -48,17 +46,15 @@ io.on('connection', function (socket) {
     console.log("A pirate or a spectator has disconnected");
     if (pirate){
       game.remove_pirate(pirate);
-      delete socket_to_pirate[socket];
     }
   });
   socket.on('user_input', function(data){
-    if (!socket_to_pirate[socket]) return;
-    console.log("Received data from " + socket_to_pirate[socket].name + ". He sent it at " + data.time);
+    console.log("Received data from " + data.name + ". He sent it at " + data.time);
     var now = new Date().getTime();
     console.log("We received it at " + now + ". Difference " + (now - data.time));
     switch(data.type){
       case 'click':
-        game.teleport_pirate(socket_to_pirate[socket],data.data[0],data.data[1]);
+        game.teleport_pirate(game.find_pirate_by_name(data.name),data.data[0],data.data[1]);
         break;
     }
   });
