@@ -5,8 +5,9 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var hooks = require('./hooksgame');
+var actions_versions = {};
 app.get('/', function (req, res) {
-	res.sendFile(__dirname + "/index.html");
+  res.sendFile(__dirname + "/index.html");
 });
 
 app.get('/client_logic.js', function (req, res) {
@@ -41,6 +42,10 @@ io.on('connection', function (socket) {
     pirate = game.add_new_pirate();
     console.log(game.toString());
     socket.emit("player", pirate.name);
+    actions_versions[pirate.name] = 0;
+    Object.keys(actions_versions).forEach(function(obj){
+      console.log(obj+" " + (actions_versions[obj]));
+    });
   }
   socket.on('disconnect', function(){
     console.log("A pirate or a spectator has disconnected");
@@ -49,14 +54,19 @@ io.on('connection', function (socket) {
     }
   });
   socket.on('user_input', function(data){
-    console.log("Received data from " + data.name + ". He sent it at " + data.time);
-    var now = new Date().getTime();
-    console.log("We received it at " + now + ". Difference " + (now - data.time));
-    switch(data.type){
-      case 'click':
-        game.teleport_pirate(game.find_pirate_by_name(data.name),data.data[0],data.data[1]);
-        break;
-    }
+    setTimeout(function(){
+      console.log("Received data from " + data.name + ". He sent it at " + data.time);
+      var now = new Date().getTime();
+      actions_versions[data.name] = data.number;
+      console.log("We received it at " + now + ". Difference " + (now - data.time));
+      switch(data.type){
+        case 'click':
+
+          game.teleport_pirate(game.find_pirate_by_name(data.name),data.data[0],data.data[1]);
+
+          break;
+      }
+    }, 1000);
   });
 });
 
@@ -73,9 +83,13 @@ function send_package(){
   var data = {};
   var pirates = [];
   data["pirates"] = pirates;
+  data["actions"] = actions_versions;
   game.pirates.forEach(function (pirate) {
     pirates.push(pirate);
   });
   io.emit("data_package", data);
   console.log(pirates.join('\n'));
+  Object.keys(actions_versions).forEach(function(obj){
+    console.log(obj+" " + (actions_versions[obj]));
+  });
 }

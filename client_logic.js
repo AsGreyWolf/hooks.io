@@ -11,8 +11,10 @@ var background_canvas = init_background();
 var smart_canvas = init_battlefield();
 var game;
 var pirate_name;//omg danger danger danger
-socket.on("player", function(data){
-  pirate_name = data;
+var actions = [];
+var actions_counter = 0;
+socket.on("player", function(name){
+  pirate_name = name;
 });
 socket.on('data_package', function (data) {
   if (!game){
@@ -20,6 +22,14 @@ socket.on('data_package', function (data) {
     game = new HooksGame(data);
   }else{
     game.pirates = data.pirates;
+  }
+  actions = actions.filter(function (obj, num){
+    return obj.number > data.actions[pirate_name];
+  });
+  console.log(actions.join("\n"));
+  for (var i = 0; i < actions.length; i++){
+    game.teleport_pirate(game.find_pirate_by_name(pirate_name),actions[i]["data"][0],actions[i]["data"][1]);
+    console.log("teleporing pirate to x:" + actions[i]["data"][0] + " y:" + actions[i]["data"][1])
   }
   requestAnimationFrame(render.bind(this, smart_canvas));
 });
@@ -29,8 +39,17 @@ smart_canvas.canvas.addEventListener("click", function(event){
   if (pirate_name && game){
     game.teleport_pirate(game.find_pirate_by_name(pirate_name),x,y);
     var now = new Date();
-    console.log(pirate_name);
-    socket.emit("user_input",{"type":"click","data":[x,y],"time":now.getTime(),"name":pirate_name});
+    actions_counter += 1;
+    var action = {
+      "type":"click",
+      "data":[x,y],
+      "time":now.getTime(),
+      "name":pirate_name,
+      "number":actions_counter
+    };
+    socket.emit("user_input",action);//huge security breach
+    actions.push(action);
+    console.log(actions.join("\n"));
   }
 })
 function init_background(){
